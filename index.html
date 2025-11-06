@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Attendance System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Landing Page -->
+    <div id="home" class="page active">
+        <div class="container">
+            <header class="header">
+                <h1>🎓 Face Recognition Attendance System</h1>
+                <p>Automated Attendance Management using AI</p>
+            </header>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalStudents">0</div>
+                    <div class="stat-label">Students Registered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="todayAttendance">0</div>
+                    <div class="stat-label">Marked Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="attendancePercentage">0%</div>
+                    <div class="stat-label">Avg Attendance</div>
+                </div>
+            </div>
+
+            <div class="action-grid">
+                <div class="action-card" onclick="showPage('registration')">
+                    <div class="card-icon">👤➕</div>
+                    <h2>Register Student</h2>
+                    <p>Add new student to the system</p>
+                    <button class="btn btn-primary">Get Started</button>
+                </div>
+
+                <div class="action-card" onclick="showPage('attendance')">
+                    <div class="card-icon">📷</div>
+                    <h2>Mark Attendance</h2>
+                    <p>Take attendance using face recognition</p>
+                    <button class="btn btn-primary">Start</button>
+                </div>
+
+                <div class="action-card" onclick="showPage('view')">
+                    <div class="card-icon">📋</div>
+                    <h2>View Attendance</h2>
+                    <p>View attendance records and reports</p>
+                    <button class="btn btn-primary">View</button>
+                </div>
+
+                <div class="action-card" onclick="showPage('export')">
+                    <div class="card-icon">⬇️</div>
+                    <h2>Export Data</h2>
+                    <p>Download attendance as CSV</p>
+                    <button class="btn btn-primary">Export</button>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <p>Face Recognition Attendance System v1.0 | Developed for Class Project</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Registration Page -->
+    <div id="registration" class="page">
+        <div class="container">
+            <button class="btn-back" onclick="showPage('home')">← Back to Home</button>
+            <h1>Register New Student</h1>
+
+            <div class="registration-container">
+                <div class="form-section">
+                    <h2>Student Information</h2>
+                    <form id="registrationForm">
+                        <div class="form-group">
+                            <label for="studentId">Student ID *</label>
+                            <input type="text" id="studentId" placeholder="e.g., STU001" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentName">Full Name *</label>
+                            <input type="text" id="studentName" placeholder="Enter full name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="department">Department *</label>
+                            <select id="department" required>
+                                <option value="">Select Department</option>
+                                <option value="CSE">Computer Science (CSE)</option>
+                                <option value="ECE">Electronics & Communication (ECE)</option>
+                                <option value="ME">Mechanical Engineering (ME)</option>
+                                <option value="Civil">Civil Engineering</option>
+                                <option value="EEE">Electrical Engineering (EEE)</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email (Optional)</label>
+                            <input type="email" id="email" placeholder="Enter email address">
+                        </div>
+                    </form>
+                </div>
+
+                <div class="camera-section">
+                    <h2>Capture Face Photo</h2>
+                    <div class="camera-container">
+                        <video id="registrationVideo" autoplay playsinline></video>
+                        <canvas id="registrationCanvas" style="display:none;"></canvas>
+                        <div class="face-detection-overlay"></div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="capturePhotoRegistration()">📷 Capture Photo</button>
+                    <button class="btn btn-warning" id="retakeBtn" onclick="retakePhoto()" style="display:none;">🔄
+                        Retake Photo</button>
+
+                    <div id="photoPreview" class="photo-preview" style="display:none;">
+                        <img id="capturedImage" src="" alt="Captured photo">
+                        <p id="faceDetectionStatus">✓ Face detected and captured</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-success" id="registerBtn" onclick="registerStudent()"
+                style="width: 100%; margin-top: 20px;">✓ Register Student</button>
+            <div id="registrationMessage" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Mark Attendance Page -->
+    <div id="attendance" class="page">
+        <div class="container">
+            <button class="btn-back" onclick="showPage('home')">← Back to Home</button>
+            <h1>Mark Attendance</h1>
+
+            <div class="attendance-container">
+                <div class="camera-section">
+                    <h2>Face Detection</h2>
+                    <div class="camera-container">
+                        <video id="attendanceVideo" autoplay playsinline></video>
+                        <canvas id="attendanceCanvas" style="display:none;"></canvas>
+                        <div id="recognitionStatus" class="recognition-status" style="display:none;">
+                            Welcome, <span id="recognizedName">Student Name</span>! ✓
+                        </div>
+                    </div>
+
+                    <div class="attendance-controls">
+                        <button class="btn btn-success" id="startAttendanceBtn" onclick="startAttendance()">▶ Start
+                            Attendance</button>
+                        <button class="btn btn-danger" id="stopAttendanceBtn" onclick="stopAttendance()"
+                            style="display:none;">⏹ Stop Attendance</button>
+                    </div>
+
+                    <div class="session-info">
+                        <p><strong>Date:</strong> <span id="sessionDate"></span></p>
+                        <p><strong>Time:</strong> <span id="sessionTime"></span></p>
+                        <p><strong>Students Present:</strong> <span id="presentCount">0</span></p>
+                    </div>
+                </div>
+
+                <div class="attendance-list-section">
+                    <h2>Present Students</h2>
+                    <div id="attendanceList" class="attendance-list">
+                        <p style="text-align: center; color: #999;">No students marked yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Attendance Page -->
+    <div id="view" class="page">
+        <div class="container">
+            <button class="btn-back" onclick="showPage('home')">← Back to Home</button>
+            <h1>View Attendance Records</h1>
+
+            <div class="filters-section">
+                <h3>Filters</h3>
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="filterFromDate">From Date:</label>
+                        <input type="date" id="filterFromDate">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterToDate">To Date:</label>
+                        <input type="date" id="filterToDate">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterDepartment">Department:</label>
+                        <select id="filterDepartment">
+                            <option value="">All Departments</option>
+                            <option value="CSE">Computer Science (CSE)</option>
+                            <option value="ECE">Electronics & Communication (ECE)</option>
+                            <option value="ME">Mechanical Engineering (ME)</option>
+                            <option value="Civil">Civil Engineering</option>
+                            <option value="EEE">Electrical Engineering (EEE)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterStudentId">Student ID:</label>
+                        <input type="text" id="filterStudentId" placeholder="Search by student ID">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="applyFilters()">🔍 Apply Filters</button>
+                <button class="btn btn-secondary" onclick="clearFilters()">↻ Clear Filters</button>
+            </div>
+
+            <div class="table-section">
+                <table id="attendanceTable" class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">S.No ↕</th>
+                            <th onclick="sortTable(1)">Student ID ↕</th>
+                            <th onclick="sortTable(2)">Name ↕</th>
+                            <th onclick="sortTable(3)">Department ↕</th>
+                            <th onclick="sortTable(4)">Date ↕</th>
+                            <th onclick="sortTable(5)">Time ↕</th>
+                            <th onclick="sortTable(6)">Status ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousPage()">← Previous</button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button class="btn btn-secondary" id="nextBtn" onclick="nextPage()">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Data Page -->
+    <div id="export" class="page">
+        <div class="container">
+            <button class="btn-back" onclick="showPage('home')">← Back to Home</button>
+            <h1>Export Attendance Data</h1>
+
+            <div class="export-container">
+                <div class="export-form">
+                    <h2>Export Options</h2>
+                    <div class="form-group">
+                        <label for="exportFromDate">From Date:</label>
+                        <input type="date" id="exportFromDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="exportToDate">To Date:</label>
+                        <input type="date" id="exportToDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="exportDepartment">Department:</label>
+                        <select id="exportDepartment">
+                            <option value="">All Departments</option>
+                            <option value="CSE">Computer Science (CSE)</option>
+                            <option value="ECE">Electronics & Communication (ECE)</option>
+                            <option value="ME">Mechanical Engineering (ME)</option>
+                            <option value="Civil">Civil Engineering</option>
+                            <option value="EEE">Electrical Engineering (EEE)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="exportToCSV()">⬇️ Export as CSV</button>
+                </div>
+
+                <div class="export-preview">
+                    <h2>Preview</h2>
+                    <div id="exportPreviewTable" style="max-height: 400px; overflow-y: auto;">
+                        <table class="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exportPreviewBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="exportMessage" class="message"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
