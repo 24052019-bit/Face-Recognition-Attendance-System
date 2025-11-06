@@ -1,7 +1,7 @@
 import streamlit as st
 import cv2
 import numpy as np
-import face_recognition
+
 import pandas as pd
 from datetime import datetime
 
